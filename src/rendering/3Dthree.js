@@ -22,6 +22,9 @@ const sensitivity = 1.2;
 let cow1;
 let cow2;
 
+const base = import.meta.env.BASE_URL;
+
+
 
 export function initThreeScene(canvas) {
     scene = new THREE.Scene();
@@ -36,12 +39,12 @@ export function initThreeScene(canvas) {
     const skyBoxLoader = new THREE.CubeTextureLoader();
 
     const texture = skyBoxLoader.load([
-        'assets/skybox/px.png',
-        'assets/skybox/nx.png',
-        'assets/skybox/py.png',
-        'assets/skybox/ny.png',
-        'assets/skybox/pz.png',
-        'assets/skybox/nz.png',
+        `${base}assets/skybox/px.png`,
+        `${base}assets/skybox/nx.png`,
+        `${base}assets/skybox/py.png`,
+        `${base}assets/skybox/ny.png`,
+        `${base}assets/skybox/pz.png`,
+        `${base}assets/skybox/nz.png`,
     ]);
 
     scene.background = texture;
@@ -116,7 +119,7 @@ function createRoom() {
 
     const wallLoader = new GLTFLoader();
 
-    wallLoader.load( 'assets/Models/wall-panel.glb', function ( gltf ) {
+    wallLoader.load( `${base}assets/Models/wall-panel.glb`, function ( gltf ) {
         
        
         leftWall = gltf.scene;
@@ -206,7 +209,7 @@ function createRoom() {
 
     const grassLoader = new GLTFLoader();
 
-    grassLoader.load( 'assets/Models/grass.glb', function ( gltf ) {
+    grassLoader.load( `${base}assets/Models/grass.glb`, function ( gltf ) {
 
         
         floor = gltf.scene;
@@ -250,7 +253,7 @@ function createRoom() {
 
     const objectLoader = new GLTFLoader();
 
-    objectLoader.load( 'assets/Models/low-poly-cow.glb', function ( gltf ) {
+    objectLoader.load( `${base}assets/Models/low-poly-cow.glb`, function ( gltf ) {
        
 
         cow1 = gltf.scene;

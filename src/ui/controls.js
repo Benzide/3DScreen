@@ -2,7 +2,10 @@ export function initializeControls() {
     const slider = document.getElementById("myRange");
     const audio = document.createElement("AUDIO");
 
-    audio.src = "assets/Sounds/mixkit-cow-barn-ambience-1754.wav";
+    const base = import.meta.env.BASE_URL;
+
+
+    audio.src = `${base}assets/Sounds/mixkit-cow-barn-ambience-1754.wav`;
 
     const state = {
         sliderValue: Number(slider.value),
