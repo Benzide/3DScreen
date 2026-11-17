@@ -9,9 +9,11 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "vite": "^8.3.6"
+    "vite": "^8.3.6",
+    "vite-plugin-mkcert": "^2.1.0"
   },
   "dependencies": {
-    "@mediapipe/tasks-vision": "^1.2.2"
+    "@mediapipe/tasks-vision": "^1.2.2",
+    "three": "^0.187.0"
   }
 }

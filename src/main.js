@@ -1,79 +1,100 @@
 import { createFaceTracker } from "./camera/faceTracking.js";
-import { calculateRoom } from "./room/roomGeometry.js";
-import { drawRoom } from "./rendering/renderer.js";
-import { getSubPolygon, projectElement } from "./rendering/projection.js";
 import { initializeControls } from "./ui/controls.js";
 
+import {
+    initThreeScene,
+    updateCameraAndScene,
+    renderScene,
+    resizeRenderer,
+} from "./rendering/3Dthree.js";
+
 async function startApp() {
-    const canvas = document.getElementById("fullscreen");
-    const ctx = canvas.getContext("2d");
 
-    const elementContainer = document.getElementById("elementContainer");
+    const canvas =
+        document.getElementById("fullscreen");
 
-    const controls = initializeControls();
-    const faceTracker = await createFaceTracker();
+    const controls =
+        initializeControls();
+
+    const faceTracker =
+        await createFaceTracker();
+
+    initThreeScene(canvas);
 
     function resizeCanvas() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+
+        canvas.width =
+            window.innerWidth;
+
+        canvas.height =
+            window.innerHeight;
+
+        resizeRenderer(
+            canvas.width,
+            canvas.height
+        );
     }
 
     resizeCanvas();
-    window.addEventListener("resize", resizeCanvas);
+
+    window.addEventListener(
+        "resize",
+        resizeCanvas
+    );
 
     let currentX = null;
     let currentY = null;
 
     const smoothing = 0.3;
 
-    function renderLoop() {
-        const position = faceTracker.update();
+    let frameCount = 0;
+    let latestPosition = null;
 
-        if (position !== null) {
-            const targetX = position.x * canvas.width;
-            const targetY = position.y * canvas.height;
+    function renderLoop() {
+
+        frameCount++;
+
+        //save some FPS
+        if (frameCount % 4 !== 0) {
+            latestPosition = faceTracker.update();
+        }
+        
+        
+        if (latestPosition) {
+
+            const targetX =
+                latestPosition.x * canvas.width;
+
+            const targetY =
+                latestPosition.y * canvas.height;
 
             if (currentX === null) {
+
                 currentX = targetX;
                 currentY = targetY;
             }
 
-            currentX += (targetX - currentX) * smoothing;
-            currentY += (targetY - currentY) * smoothing;
-        }
+            currentX +=
+                (targetX - currentX) * smoothing;
 
-        if (currentX !== null) {
-            const room = calculateRoom(
+            currentY +=
+                (targetY - currentY) * smoothing;
+
+            updateCameraAndScene(
+                controls.cow1Pos,
+                23 - controls.sliderValue,
                 currentX,
                 currentY,
                 canvas.width,
-                canvas.height,
-                controls.sliderValue
+                canvas.height
             );
-
-            drawRoom(ctx, room);
-
-            if (controls.projected) {
-                const selectedSurface = {
-                    left: room.leftWall,
-                    top: room.roof,
-                    right: room.rightWall,
-                    bottom: room.floor,
-                    middle: room.middle
-                }[controls.selectedWall];
-
-                projectElement(
-                    elementContainer,
-                    getSubPolygon(
-                        selectedSurface,
-                        controls.resizeValue.x,
-                        controls.resizeValue.y
-                    )
-                );
-            }
         }
 
-        requestAnimationFrame(renderLoop);
+        renderScene();
+
+        requestAnimationFrame(
+            renderLoop
+        );
     }
 
     renderLoop();
