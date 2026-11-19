@@ -1,16 +1,17 @@
-import { FilesetResolver, FaceLandmarker } from "@mediapipe/tasks-vision";
+import { FilesetResolver, FaceDetector } from "@mediapipe/tasks-vision";
 
 export async function createFaceTracker() {
     const vision = await FilesetResolver.forVisionTasks(
         "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
     );
 
-    const faceLandmarker = await FaceLandmarker.createFromOptions(
+    const faceDetector = await FaceDetector.createFromOptions(
         vision,
         {
             baseOptions: {
-                modelAssetPath: "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",
-                delegate: "GPU"
+            modelAssetPath:
+                "https://storage.googleapis.com/mediapipe-models/face_detector/blaze_face_full_range/float16/latest/blaze_face_full_range.tflite",
+            delegate: "GPU",
             },
             runningMode: "VIDEO",
             numFaces: 1
@@ -37,17 +38,18 @@ export async function createFaceTracker() {
         if (video.readyState >= 2 && video.currentTime !== lastVideoTime) {
             lastVideoTime = video.currentTime;
 
-            const result = faceLandmarker.detectForVideo(
+            const result = faceDetector.detectForVideo(
                 video,
                 performance.now()
             );
 
-            if (result.faceLandmarks.length > 0) {
-                const landmarks = result.faceLandmarks[0];
+            if (result.detections.length > 0) {
+                const rightEye = result.detections[0].keypoints[0];
+                const leftEye = result.detections[0].keypoints[1];
 
                 position = {
-                    x: (landmarks[468].x + landmarks[473].x) / 2,
-                    y: (landmarks[468].y + landmarks[473].y) / 2
+                    x: (rightEye.x + leftEye.x) / 2,
+                    y: (rightEye.y + leftEye.y) / 2
                 };
             }
         }
